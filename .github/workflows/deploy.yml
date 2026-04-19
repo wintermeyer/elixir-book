@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   deploy:
-    runs-on: [self-hosted, eliph]
+    runs-on: [self-hosted, books]
 
     steps:
       - uses: actions/checkout@v4
