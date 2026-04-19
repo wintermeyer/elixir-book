@@ -1,0 +1,10 @@
+{
+  "name": "elixir-book",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Antora site generator for wintermeyer-consulting.de/elixir/book/",
+  "devDependencies": {
+    "@antora/cli": "3.1.14",
+    "@antora/site-generator": "3.1.14"
+  }
+}

@@ -1,0 +1,14 @@
+= Welcome
+Stefan Wintermeyer <sw@wintermeyer-consulting.de>
+
+This is the Elixir chapter from the
+link:https://wintermeyer-consulting.de/phoenix/book/[_Elixir, Phoenix and
+Ash Beginner's Guide_], split page-per-topic so each concept has its
+own URL. If you want the full guide (Elixir, Phoenix, Ash, and
+recipes), read it in the parent book.
+
+Pick a topic from the sidebar.
+
+If this is your first functional programming language you might want
+to get a cup of coffee first. It might take a while to get used to
+the functional programming paradigm. **It took me a long time too!**

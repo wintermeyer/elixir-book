@@ -1,0 +1,18 @@
+site:
+  title: Elixir
+  url: https://wintermeyer-consulting.de/elixir
+  start_page: book::index.adoc
+content:
+  sources:
+  - url: https://github.com/wintermeyer/elixir-book.git
+    branches: main
+ui:
+  bundle:
+    url: https://github.com/wintermeyer/wincon-antora-ui/releases/download/latest/ui-bundle.zip
+    snapshot: true
+  supplemental_files: ./ui-supplemental
+  output_dir: antora-assets
+output:
+  dir: build/site
+runtime:
+  fetch: true
