@@ -1,0 +1,177 @@
+[[error-handling]]
+== Error Handling
+indexterm:[Error Handling]
+
+Elixir gives you two different styles for handling things that can go
+wrong:
+
+* *Tagged tuples* like `{:ok, value}` and `{:error, reason}` for
+  everyday, expected outcomes (a file might not exist, a database
+  might reject a write, a network call might fail).
+* *Exceptions* (`raise`, `try`, `rescue`) for truly unexpected
+  situations that should interrupt the normal flow.
+
+The community prefers tagged tuples for almost everything. Reserve
+exceptions for bugs and "this should never happen" cases.
+
+=== The `{:ok, _}` / `{:error, _}` Idiom
+indexterm:[Error Handling, Tagged Tuples]
+
+Most functions in the Elixir standard library return a two-element
+tuple. The first element is an atom that tells you what happened, the
+second element is the value or the reason:
+
+[source,elixir]
+----
+iex> Integer.parse("42")
+{42, ""}
+iex> Integer.parse("abc")
+:error
+
+iex> Map.fetch(%{a: 1}, :a)
+{:ok, 1}
+iex> Map.fetch(%{a: 1}, :b)
+:error
+----
+
+A function that needs to succeed or fail typically returns
+`{:ok, value}` or `{:error, reason}`. Here is a small example:
+
+[source,elixir]
+----
+iex> defmodule Account do
+...>   def withdraw(balance, amount) when amount <= balance do
+...>     {:ok, balance - amount}
+...>   end
+...>
+...>   def withdraw(_balance, _amount) do
+...>     {:error, :insufficient_funds}
+...>   end
+...> end
+
+iex> Account.withdraw(100, 30)
+{:ok, 70}
+iex> Account.withdraw(100, 200)
+{:error, :insufficient_funds}
+----
+
+=== Branching on the Result
+
+Once a function gives you a tagged tuple, you pattern match on the
+two shapes. A `case` is the most direct tool:
+
+[source,elixir]
+----
+case Account.withdraw(100, 30) do
+  {:ok, new_balance} ->
+    IO.puts("New balance: #{new_balance}")
+  {:error, reason} ->
+    IO.puts("Could not withdraw: #{reason}")
+end
+----
+
+For a chain of operations that all have to succeed,
+xref:control-structures/with-and-for.adoc[`with`] is the more
+readable choice because it only mentions the error paths once.
+
+=== Raising an Exception
+indexterm:[Error Handling, raise]
+
+Use `raise/1` to stop the normal flow when something truly should not
+happen:
+
+[source,elixir]
+----
+iex> raise "oh no"
+** (RuntimeError) oh no
+----
+
+You can be more specific by naming an exception module:
+
+[source,elixir]
+----
+iex> raise ArgumentError, "age must be an integer"
+** (ArgumentError) age must be an integer
+----
+
+NOTE: If a function *can* fail in a way the caller should handle,
+return `{:error, reason}`. Save `raise` for bugs and programmer
+mistakes.
+
+=== `try` / `rescue` / `after`
+indexterm:[Error Handling, try, rescue, after]
+
+When a call *can* raise an exception and you need to keep running,
+wrap it in a `try`:
+
+[source,elixir]
+----
+iex> try do
+...>   raise "boom"
+...> rescue
+...>   e in RuntimeError -> "rescued: #{e.message}" <1>
+...> end
+"rescued: boom"
+----
+<1> `e in RuntimeError` binds `e` to the exception struct if it
+matches the `RuntimeError` type. You can list more than one type,
+separated by commas.
+
+The optional `after` block always runs, whether the code raised or
+not. It is the place for cleanup work:
+
+[source,elixir]
+----
+iex> try do
+...>   raise "boom"
+...> rescue
+...>   _ -> "rescued"
+...> after
+...>   IO.puts("always runs")
+...> end
+always runs
+"rescued"
+----
+
+TIP: Most Elixir code never uses `try`. If you are about to write one,
+ask yourself whether the function you are calling has a safer twin
+that returns `{:error, _}` instead of raising. For example, use
+`File.read/1` (tagged tuple) instead of `File.read!/1` (raises).
+
+=== Custom Exceptions
+indexterm:[Error Handling, defexception]
+
+You can define your own exception module with `defexception`:
+
+[source,elixir]
+----
+iex> defmodule MyApp.NotFound do
+...>   defexception message: "resource not found"
+...> end
+
+iex> raise MyApp.NotFound
+** (MyApp.NotFound) resource not found
+
+iex> raise MyApp.NotFound, message: "user 42 not found"
+** (MyApp.NotFound) user 42 not found
+----
+
+Custom exceptions give you a type to match against in a `rescue`
+block, which is nicer than matching on the message string.
+
+=== `throw` and `catch`
+indexterm:[Error Handling, throw, catch]
+
+Elixir also has `throw` and `catch`, which let you bail out of a deep
+call stack without going through the exception machinery. You will
+almost never need them. If you see a library using `throw` it is
+usually inside a single function as an implementation detail, not as
+a way to model application errors.
+
+=== Rules of Thumb
+
+* Expected failure: return `{:ok, _}` / `{:error, _}`.
+* Unexpected failure (a bug): `raise`.
+* Use `try` / `rescue` only when you cannot avoid a raising call.
+* If you see `!` at the end of a function name (`File.read!/1`), that
+  function raises on error. Its non-`!` twin returns a tagged tuple.

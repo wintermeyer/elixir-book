@@ -2,14 +2,8 @@
 == Modules and Functions
 indexterm:["Modules", "Functions"]
 
-In Elixir, we organize code in a structured way using modules and functions. 
-
-NOTE: For Elixir beginners we now run into a typical chicken and egg problem.
-Because how can I show you how Modules and Functions work while you have never
-used any Elixir code? I try to use code examples which should be easy to 
-understand.
-
-Modules are like containers for functions, which represent reusable pieces of code. 
+In Elixir, we organize code in a structured way using modules and functions.
+Modules are like containers for functions, which represent reusable pieces of code.
 
 Let's illustrate this with an example:
 
@@ -263,6 +257,41 @@ iex> Apples.price_per_kg()
 ----
 
 In this example, the `alias FruitShop.Apples` directive lets you call functions from `FruitShop.Apples` using the shortened name `Apples`. This can significantly improve readability when working with modules that have long or complex names.
+
+[[require-modules]]
+=== Require
+indexterm:["Require"]
+
+The `require` directive tells the compiler that a module must be
+loaded before the current module is compiled. In practice you only
+reach for `require` when you want to use a module's *macros*, because
+macros are expanded at compile time and therefore need the defining
+module to already be there.
+
+The most common example is Elixir's built-in `Logger`:
+
+[source,elixir]
+----
+iex> defmodule MyApp do
+...>   require Logger <1>
+...>
+...>   def warn_once do
+...>     Logger.warning("something smells off") <2>
+...>   end
+...> end
+
+iex> MyApp.warn_once()
+16:42:15.001 [warning] something smells off
+:ok
+----
+<1> `require Logger` makes the macros in the `Logger` module available
+inside `MyApp`.
+<2> `Logger.warning/1` is a macro, not a regular function. Without the
+`require`, the compiler would complain.
+
+NOTE: For regular (non-macro) functions you do not need `require`.
+Reach for it only when the module's documentation tells you to or
+when the compiler asks you to.
 
 [[use-keyword]]
 === Use

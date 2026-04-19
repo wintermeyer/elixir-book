@@ -43,7 +43,7 @@ how Elixir groups related functions together. You usually need to
 import or require a module before using it, but `IO` is so common that
 Elixir makes it available automatically.
 * *`puts/1`* is a function. The `/1` is the function's
-<<function-arity,arity>>, the number of arguments it takes. `IO.puts/1`
+xref:modules-and-functions.adoc#function-arity[arity], the number of arguments it takes. `IO.puts/1`
 takes a single argument (the string to print). A module can have many
 functions with the same name as long as their arities differ, for
 example `IO.puts/1` (print to standard output) and `IO.puts/2` (print

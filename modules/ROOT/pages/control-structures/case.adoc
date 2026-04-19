@@ -10,8 +10,9 @@ value.
 
 NOTE: `case` relies on *pattern matching*, Elixir's way of comparing a value
 against a shape (a number, an atom, a tuple, a list, and so on). The examples
-here show the basic idea. The xref:operators/match-operator.adoc[match
-operator chapter] covers pattern matching in full.
+here show the basic idea. The
+xref:pattern-matching/index-pattern-matching.adoc[Pattern Matching chapter]
+covers the full story.
 
 A `case` expression evaluates an expression, and compares the result to
 each pattern specified in the clauses. When a match is found, the associated

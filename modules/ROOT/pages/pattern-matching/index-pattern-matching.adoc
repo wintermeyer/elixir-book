@@ -1,0 +1,230 @@
+[[pattern-matching]]
+== Pattern Matching
+indexterm:[Pattern Matching]
+
+Pattern matching is one of Elixir's defining features. In most
+languages `=` means "assign this value to this variable". Elixir reads
+`=` differently and calls it the *match operator*: "try to match the
+left-hand side against the right-hand side".
+
+Here is the smallest possible example:
+
+[source,elixir]
+----
+iex> x = 5 <1>
+5
+iex> 5 = x <2>
+5
+iex> 6 = x <3>
+** (MatchError) no match of right hand side value: 5
+----
+<1> A variable on the left is unbound, so Elixir binds `x` to `5`.
+<2> Both sides have the same value, the match succeeds.
+<3> `6` cannot match `5`, so Elixir raises a `MatchError`.
+
+Once you can describe a *shape*, you can destructure any value into
+parts. Here is a tuple example:
+
+[source,elixir]
+----
+iex> {a, b, c} = {:hello, "world", 42}
+{:hello, "world", 42}
+iex> a
+:hello
+iex> b
+"world"
+iex> c
+42
+----
+
+In that snippet, Elixir matches the variables `a`, `b`, and `c`
+against the three elements of the tuple on the right. If the shapes do
+not line up, you get a `MatchError`:
+
+[source,elixir]
+----
+iex> {d, e} = {:hi, "there", 23}
+** (MatchError) no match of right hand side value: {:hi, "there", 23}
+----
+
+NOTE: Pattern matching is used in many more places than just `=`. It is
+how `case` picks a branch, how `with` chains a happy path, and how a
+function with several clauses decides which one runs. See the
+xref:pattern-matching/guards.adoc[guards] and
+xref:pattern-matching/multi-clause-functions.adoc[multi-clause functions]
+chapters for those applications.
+
+=== Destructuring Lists
+indexterm:[Pattern Matching, Lists]
+
+Elixir offers a special syntax to match the head and tail of a list:
+
+[source,elixir]
+----
+iex> shopping_list = ["apple", "orange", "banana", "pineapple"] <1>
+["apple", "orange", "banana", "pineapple"]
+iex> [head | tail] = shopping_list <2>
+["apple", "orange", "banana", "pineapple"]
+iex> head
+"apple"
+iex> tail
+["orange", "banana", "pineapple"]
+iex> [first, second | rest] = shopping_list <3>
+["apple", "orange", "banana", "pineapple"]
+iex> first
+"apple"
+iex> second
+"orange"
+iex> rest
+["banana", "pineapple"]
+----
+<1> We bind a list to `shopping_list`.
+<2> `[head | tail]` is the special syntax that splits a list into its
+first element and the rest.
+<3> You can also peel off more than one element before the `|`.
+
+If you know the exact length, you can match the list as a whole:
+
+[source,elixir]
+----
+iex> [a, b, c, d] = ["apple", "orange", "banana", "pineapple"]
+["apple", "orange", "banana", "pineapple"]
+iex> a
+"apple"
+iex> [e, f, g] = ["apple", "orange", "banana", "pineapple"] <1>
+** (MatchError) no match of right hand side value: ...
+----
+<1> A three-element pattern cannot match a four-element list.
+
+=== Destructuring Maps
+indexterm:[Pattern Matching, Maps]
+
+Matching a map works a little differently. You only need to list the
+keys you care about:
+
+[source,elixir]
+----
+iex> product_prices = %{apple: 0.5, orange: 0.7, pineapple: 1}
+%{apple: 0.5, orange: 0.7, pineapple: 1}
+iex> %{orange: price} = product_prices <1>
+%{apple: 0.5, orange: 0.7, pineapple: 1}
+iex> price
+0.7
+iex> %{orange: price1, apple: price2} = product_prices <2>
+%{apple: 0.5, orange: 0.7, pineapple: 1}
+iex> price1
+0.7
+iex> price2
+0.5
+----
+<1> Here we match just one key.
+<2> You can match several keys at once. The map may have more keys,
+they are simply ignored.
+
+=== Destructuring Strings
+indexterm:[Pattern Matching, Strings]
+
+Pattern matching also works on strings when the prefix is fixed:
+
+[source,elixir]
+----
+iex> user = "Stefan Wintermeyer"
+"Stefan Wintermeyer"
+iex> "Stefan " <> last_name = user
+"Stefan Wintermeyer"
+iex> last_name
+"Wintermeyer"
+----
+
+NOTE: The left side of a `<>` operator in a match must always be a
+fixed string. Otherwise Elixir cannot tell where the split is.
+
+=== Wildcards
+indexterm:[Pattern Matching, Wildcards]
+
+Sometimes you want to match something but you do not care about the
+value. Use the `_` wildcard, either on its own or as a prefix to a
+variable name, to tell Elixir you do not need the binding:
+
+[source,elixir]
+----
+iex> cart = {"apple", "orange", "banana"}
+{"apple", "orange", "banana"}
+iex> {first, _, _} = cart <1>
+{"apple", "orange", "banana"}
+iex> first
+"apple"
+
+iex> cart2 = ["apple", "orange", "banana", "pineapple"]
+["apple", "orange", "banana", "pineapple"]
+iex> [head | _tail] = cart2 <2>
+["apple", "orange", "banana", "pineapple"]
+iex> head
+"apple"
+----
+<1> `_` ignores the second and third elements of the tuple.
+<2> `_tail` is still a wildcard, but the name describes the intent.
+Elixir will not warn about an unused variable when the name starts
+with `_`.
+
+=== The Pin Operator `^`
+indexterm:[Pattern Matching, Pin Operator]
+
+By default, a bare variable on the left side of `=` is either bound (if
+unbound) or rebound (if already bound). Sometimes you want the opposite:
+"use the *current* value of this variable as part of the pattern, and
+fail if the right-hand side does not match it". That is what the pin
+operator `^` is for.
+
+[source,elixir]
+----
+iex> expected = :ok
+:ok
+iex> ^expected = :ok <1>
+:ok
+iex> ^expected = :error <2>
+** (MatchError) no match of right hand side value: :error
+----
+<1> The pin operator says "match against the value `:ok` that
+`expected` is already bound to". The match succeeds.
+<2> `:error` is not equal to the pinned value, so the match fails.
+
+Pinning is especially useful inside more complex patterns:
+
+[source,elixir]
+----
+iex> key = :name
+:name
+iex> %{^key => name} = %{name: "Alice", age: 42} <1>
+%{name: "Alice", age: 42}
+iex> name
+"Alice"
+----
+<1> Without the pin, `key` on the left would be a new variable. With
+the pin, it is the atom `:name` taken from the already-bound variable.
+
+=== Rebinding
+indexterm:[Pattern Matching, Rebinding]
+
+A variable in Elixir is immutable: once you bind `x = 5`, the value `5`
+itself never changes. But the *name* `x` can be rebound to point at a
+different value:
+
+[source,elixir]
+----
+iex> x = 5
+5
+iex> y = x <1>
+5
+iex> x = 10 <2>
+10
+iex> y <3>
+5
+----
+<1> `y` is bound to the current value of `x`, which is `5`.
+<2> `x` is rebound to `10`. The old value `5` is untouched.
+<3> `y` still holds `5`. Rebinding `x` did not change `y`.
+
+TIP: If you want to guarantee that a value cannot be accidentally
+rebound later in the same scope, use the pin operator on the next
+match: `^x = some_value`.

@@ -1,0 +1,133 @@
+[[binaries-and-charlists]]
+== Binaries and Charlists
+indexterm:[Binaries, Charlists]
+
+You have already seen Elixir strings written between double quotes:
+
+[source,elixir]
+----
+iex> "Hello, world!"
+"Hello, world!"
+----
+
+That is a *binary*: a sequence of bytes, encoded in UTF-8. Elixir also
+supports a second shape for text written between single quotes:
+
+[source,elixir]
+----
+iex> ~c"Hello, world!" <1>
+~c"Hello, world!"
+----
+<1> The `~c` sigil builds a *charlist*, a list of Unicode codepoints.
+
+Most of the time you only need the double-quoted binary form. The
+charlist form shows up when you talk to Erlang libraries, so it is
+worth knowing what it is.
+
+NOTE: Older Elixir code uses plain `'Hello'` single quotes for
+charlists. The `~c"..."` sigil is the modern spelling and the one you
+will see in Elixir 1.20 code.
+
+=== The Shape of a Binary
+
+A binary is built out of bytes. You can see this by looking at the
+first byte of a simple ASCII string:
+
+[source,elixir]
+----
+iex> "hello"
+"hello"
+iex> byte_size("hello")
+5
+iex> <<first, _rest::binary>> = "hello" <1>
+"hello"
+iex> first
+104 <2>
+----
+<1> The `<<...>>` syntax is the *bitstring* form. Here we peel off
+the first byte.
+<2> `104` is the byte value of the letter `h`.
+
+For ASCII-only text, one character equals one byte. For non-ASCII
+characters UTF-8 uses more than one byte per character, so
+`byte_size/1` and `String.length/1` can differ:
+
+[source,elixir]
+----
+iex> byte_size("über")
+5
+iex> String.length("über")
+4
+----
+
+TIP: Prefer `String.length/1` when you want the number of characters
+a user sees, and `byte_size/1` when you care about storage or network
+size.
+
+=== The Shape of a Charlist
+
+A charlist is simply a list where each element is a codepoint:
+
+[source,elixir]
+----
+iex> ~c"hi"
+~c"hi"
+iex> [104, 105] == ~c"hi"
+true
+iex> hd(~c"hello")
+104
+----
+
+IEx prints a list of codepoints as `~c"..."` when all the values look
+like printable characters. That is a display convenience, the data is
+still a list:
+
+[source,elixir]
+----
+iex> [104, 105, 99]
+~c"hic"
+iex> [104, 105, 1]
+[104, 105, 1]
+----
+
+=== Converting Between the Two
+indexterm:[Binaries, Charlists, Conversion]
+
+Two helper functions bridge the forms:
+
+[source,elixir]
+----
+iex> to_charlist("hello")
+~c"hello"
+iex> to_string(~c"hello")
+"hello"
+----
+
+`String.to_charlist/1` and `List.to_string/1` do the same job with
+stricter types.
+
+=== Why It Matters
+
+Elixir runs on the Erlang VM, and many older Erlang libraries accept
+and return charlists, not binaries. When a function from Erlang land
+returns something that IEx prints as `~c"..."`, convert it to a
+string with `to_string/1` before handing it back to the rest of your
+Elixir code:
+
+[source,elixir]
+----
+iex> :inet.gethostname()
+{:ok, ~c"my-laptop"}
+iex> {:ok, hostname_charlist} = :inet.gethostname()
+{:ok, ~c"my-laptop"}
+iex> to_string(hostname_charlist)
+"my-laptop"
+----
+
+=== Bitstrings in One Sentence
+
+A *bitstring* is the general case: a sequence of bits. A *binary* is a
+bitstring whose length in bits is a multiple of 8 (so it divides
+evenly into bytes). Unless you are writing a network protocol or
+parsing a file format by hand, you only ever deal with binaries, and
+you call them strings.

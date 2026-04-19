@@ -1,0 +1,172 @@
+[[guards]]
+== Guards
+indexterm:[Pattern Matching, Guards]
+
+Pattern matching can check the *shape* of a value. Guards add a second
+layer: they check the *content*. A guard is a short expression that
+starts with the keyword `when` and must evaluate to `true` for the
+match to succeed.
+
+Here is the smallest guard example:
+
+[source,elixir]
+----
+iex> defmodule Check do
+...>   def number?(n) when is_integer(n), do: "yes, an integer"
+...>   def number?(_), do: "no"
+...> end
+
+iex> Check.number?(42)
+"yes, an integer"
+iex> Check.number?("42")
+"no"
+----
+
+The first clause only runs when `is_integer/1` returns `true`. For any
+other value the guard fails and Elixir falls through to the next
+clause.
+
+=== Where Guards May Appear
+indexterm:[Pattern Matching, Guards, Places]
+
+Guards are allowed in every place that does pattern matching:
+
+[source,elixir]
+----
+# In a function clause
+def can_vote?(age) when is_integer(age) and age >= 18, do: true
+
+# In a case expression
+case value do
+  n when is_number(n) and n > 0 -> "positive number"
+  _ -> "something else"
+end
+
+# In an anonymous function
+classify = fn
+  n when is_integer(n) -> :integer
+  n when is_float(n)   -> :float
+  _                    -> :other
+end
+
+# In for and with
+for n <- list, is_integer(n), do: n * 2
+----
+
+NOTE: `cond` does not take guards directly because its branches are
+already arbitrary boolean expressions.
+
+=== Common Guard Functions
+indexterm:[Pattern Matching, Guards, Functions]
+
+Only a limited set of functions may appear inside a guard. The table
+below lists the ones you will use most often as a beginner. The full
+list is at https://hexdocs.pm/elixir/patterns-and-guards.html.
+
+.Type checks
+[cols="1,2"]
+|===
+|Function |Purpose
+
+|`is_atom/1`     |true if the value is an atom
+|`is_binary/1`   |true if the value is a binary (a string is a binary)
+|`is_bitstring/1`|true if the value is a bitstring
+|`is_boolean/1`  |true if the value is `true` or `false`
+|`is_float/1`    |true if the value is a float
+|`is_function/1` |true if the value is a function
+|`is_function/2` |true if the value is a function of the given arity
+|`is_integer/1`  |true if the value is an integer
+|`is_list/1`     |true if the value is a list
+|`is_map/1`      |true if the value is a map
+|`is_map_key/2`  |true if the map has the given key
+|`is_nil/1`      |true if the value is `nil`
+|`is_number/1`   |true if the value is an integer or float
+|`is_pid/1`      |true if the value is a process identifier
+|`is_reference/1`|true if the value is a reference
+|`is_tuple/1`    |true if the value is a tuple
+|===
+
+.Size and length
+[cols="1,2"]
+|===
+|Function |Purpose
+
+|`byte_size/1`  |number of bytes in a binary
+|`tuple_size/1` |number of elements in a tuple
+|`map_size/1`   |number of entries in a map
+|`length/1`     |number of elements in a list (walks the whole list)
+|`hd/1`         |head of a list
+|`tl/1`         |tail of a list
+|`elem/2`       |element at a given index of a tuple
+|===
+
+.Operators allowed in guards
+[cols="1,2"]
+|===
+|Operator |Purpose
+
+|`==`, `!=`, `===`, `!==` |equality
+|`<`, `<=`, `>`, `>=`     |comparison
+|`+`, `-`, `*`, `/`       |arithmetic
+|`and`, `or`, `not`       |strict boolean logic
+|`in`                     |membership in a list or range
+|===
+
+Here is a combined example that uses several of these:
+
+[source,elixir]
+----
+iex> defmodule Temperature do
+...>   def describe(t) when is_number(t) and t < 0,                do: "freezing"
+...>   def describe(t) when is_number(t) and t in 0..20,           do: "cool"
+...>   def describe(t) when is_number(t) and t > 20 and t <= 30,   do: "warm"
+...>   def describe(t) when is_number(t) and t > 30,               do: "hot"
+...>   def describe(_),                                            do: "not a number"
+...> end
+
+iex> Temperature.describe(-5)
+"freezing"
+iex> Temperature.describe(25)
+"warm"
+iex> Temperature.describe("warm")
+"not a number"
+----
+
+=== What You Cannot Do in a Guard
+indexterm:[Pattern Matching, Guards, Limitations]
+
+Guards must stay small and side-effect free. That rules out:
+
+* your own functions (only the built-in guards above are allowed),
+* calls that could raise or have side effects (like `String.length/1`
+  on a non-binary),
+* `if`, `case`, `cond` and similar control structures.
+
+If you need something more complex, move the check into the body of
+the clause and branch with `case` or `cond` there:
+
+[source,elixir]
+----
+iex> defmodule Example do
+...>   def handle(value) when is_binary(value) do <1>
+...>     case String.length(value) do <2>
+...>       0 -> "empty string"
+...>       n when n > 0 -> "string of length #{n}"
+...>     end
+...>   end
+...>
+...>   def handle(_), do: "not a string"
+...> end
+
+iex> Example.handle("")
+"empty string"
+iex> Example.handle("hello")
+"string of length 5"
+iex> Example.handle(42)
+"not a string"
+----
+<1> The guard only checks the shape.
+<2> The richer check happens inside the function body.
+
+TIP: You can write your own guard with `defguard` once you start
+building libraries. For beginners, the built-in guards are plenty.

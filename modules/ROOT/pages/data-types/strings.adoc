@@ -6,6 +6,11 @@ indexterm:[Elixir,Strings]In Elixir, strings are binary sequences, encoded in
 UTF-8. This encoding enables strings to handle any Unicode character, which is a
 significant advantage when developing international applications.
 
+NOTE: Elixir also has a second text shape called a *charlist*, written
+between single quotes. You only need it for some Erlang libraries. The
+xref:binaries-and-charlists.adoc[Binaries and Charlists chapter] covers
+the distinction.
+
 Elixir strings are defined using double quotes (`"`). Here's an example:
 
 [source,elixir]

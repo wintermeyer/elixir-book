@@ -1,0 +1,190 @@
+[[testing-with-exunit]]
+== Testing with ExUnit
+indexterm:[ExUnit, Testing]
+
+ExUnit is Elixir's built-in testing framework. It ships with the
+language, and every project created by
+xref:mix.adoc[`mix new`] already has a working test setup. Writing a
+test is often the first thing you do when you add a new feature.
+
+Here is the smallest possible test:
+
+[source,elixir]
+----
+defmodule MathTest do
+  use ExUnit.Case
+
+  test "one plus one is two" do
+    assert 1 + 1 == 2
+  end
+end
+----
+
+Run it with `mix test` and you see a single green dot.
+
+=== Starting a New Project
+
+The easiest way to follow along is to create a fresh project:
+
+[source,bash]
+----
+$ mix new demo
+$ cd demo
+----
+
+`mix new` creates a `test/` directory with two files:
+
+* `test/test_helper.exs` starts ExUnit when you run `mix test`.
+* `test/demo_test.exs` is a sample test module.
+
+Open `test/demo_test.exs` and you will see this:
+
+[source,elixir]
+----
+defmodule DemoTest do
+  use ExUnit.Case
+  doctest Demo
+
+  test "greets the world" do
+    assert Demo.hello() == :world
+  end
+end
+----
+
+Run it:
+
+[source,bash]
+----
+$ mix test
+Compiling 1 file (.ex)
+Generated demo app
+.
+Finished in 0.01 seconds
+1 test, 0 failures
+----
+
+=== Writing Your Own Test
+
+Let's give `Demo` something worth testing. Replace the body of
+`lib/demo.ex`:
+
+[source,elixir]
+----
+defmodule Demo do
+  def add(a, b), do: a + b
+end
+----
+
+And write a test for it in `test/demo_test.exs`:
+
+[source,elixir]
+----
+defmodule DemoTest do
+  use ExUnit.Case
+
+  test "add/2 sums two integers" do
+    assert Demo.add(2, 3) == 5
+  end
+
+  test "add/2 works with negative numbers" do
+    assert Demo.add(-1, 1) == 0
+  end
+end
+----
+
+`mix test` now reports two passing tests.
+
+=== `assert` and `refute`
+indexterm:[ExUnit, assert, refute]
+
+The two macros you will use most are `assert` and `refute`:
+
+[source,elixir]
+----
+test "assert and refute" do
+  assert 1 + 1 == 2
+  refute 1 + 1 == 3
+end
+----
+
+When an assertion fails, ExUnit prints a detailed message that shows
+both sides of the comparison, which is why you write the comparison
+inline instead of calling a helper like `equal?/2`.
+
+=== Grouping Tests with `describe`
+indexterm:[ExUnit, describe]
+
+Use `describe` to group related tests under a shared label. The label
+shows up in the test output, which makes failures easier to locate:
+
+[source,elixir]
+----
+defmodule DemoTest do
+  use ExUnit.Case
+
+  describe "add/2" do
+    test "sums two positive integers" do
+      assert Demo.add(2, 3) == 5
+    end
+
+    test "sums two negative integers" do
+      assert Demo.add(-2, -3) == -5
+    end
+  end
+end
+----
+
+=== Shared Setup with `setup`
+indexterm:[ExUnit, setup]
+
+If several tests need the same starting point, put the shared work in
+a `setup` block. The map you return is merged into the test context:
+
+[source,elixir]
+----
+defmodule CartTest do
+  use ExUnit.Case
+
+  setup do
+    cart = %{apples: 2, oranges: 3}
+    %{cart: cart}
+  end
+
+  test "cart has two apples", %{cart: cart} do
+    assert cart.apples == 2
+  end
+
+  test "cart has three oranges", %{cart: cart} do
+    assert cart.oranges == 3
+  end
+end
+----
+
+`setup` runs before each test. There is also `setup_all` that runs
+once before the whole module, for expensive work you only want to do
+once.
+
+=== Running Part of the Suite
+indexterm:[ExUnit, mix test]
+
+`mix test` has a few shortcuts you will use every day:
+
+[source,bash]
+----
+$ mix test                              <1>
+$ mix test test/demo_test.exs           <2>
+$ mix test test/demo_test.exs:12        <3>
+$ mix test --failed                     <4>
+$ mix test --stale                      <5>
+----
+<1> Run everything.
+<2> Run the tests in a single file.
+<3> Run only the test whose `test` line is on line 12.
+<4> Re-run only the tests that failed last time.
+<5> Re-run only the tests whose code or dependencies changed.
+
+=== Where to Go From Here
+
+This is enough to write useful tests for plain Elixir code. Phoenix
+adds a few helpers of its own (`ConnTest`, `LiveViewTest`, database
+sandboxing) but they all build on the ExUnit foundation you just saw.

@@ -34,7 +34,24 @@ bremen2. The runner fetches the wincon nav/footer (stamping
 ## Where the content is edited
 
 In this repo, under `modules/ROOT/pages/`. The Phoenix book no
-longer has an Elixir chapter — this repo is the one source of truth.
+longer has an Elixir chapter, this repo is the one source of truth.
+
+## Chapter layout
+
+The book is organised so each concept is introduced before it is used.
+The top-level sections are, in reading order:
+
+1. First Steps (iex, hello world, basic calculations, basic debugging)
+2. Basic Data Types (integers & floats, booleans, atoms, strings)
+3. Operators (arithmetic, comparison, boolean, pipe, match, range, capture, cons, and the two string operators)
+4. Modules and Functions (plus higher-order functions, variables, scopes, immutability)
+5. Collections (lists, tuples, keyword lists, maps, structs, type conversions)
+6. Pattern Matching (overview, guards, multi-clause functions)
+7. Control Flow (if, case, cond, with, for)
+8. Enumerables (Enum, Stream, recursion, logical expressions)
+9. More (error handling, binaries and charlists, sigils, Mix, testing with ExUnit)
+
+Processes, GenServer, and OTP are intentionally out of scope here and live in the Phoenix book.
 
 ## License
 

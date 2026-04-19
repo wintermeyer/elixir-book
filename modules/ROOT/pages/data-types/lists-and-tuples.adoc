@@ -21,7 +21,7 @@ iex> {true, :apple, 234, "house", 3.14} <3>
 {true, :apple, 234, "house", 3.14}
 ----
 <1> A tuple containing three integers.
-<2> A tuple with an atom representing status and a string — an often used construct in Elixir.
+<2> A tuple with an atom representing status and a string, an often used construct in Elixir.
 <3> A tuple containing different data types.
 
 You can quickly access an element of a tuple by using the `elem/2` function:

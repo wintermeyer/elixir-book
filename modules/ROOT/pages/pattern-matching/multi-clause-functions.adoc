@@ -1,0 +1,145 @@
+[[multi-clause-functions]]
+== Multi-Clause Functions
+indexterm:[Pattern Matching, Multi-Clause Functions]
+
+A function in Elixir can have several clauses with the *same name and
+same arity*. Each clause describes a pattern. When the function is
+called, Elixir walks the clauses top to bottom and runs the first one
+whose pattern (and guard, if any) matches the arguments.
+
+Here is the smallest example:
+
+[source,elixir]
+----
+iex> defmodule Traffic do
+...>   def light(:red),    do: "stop"
+...>   def light(:yellow), do: "slow down"
+...>   def light(:green),  do: "go"
+...> end
+
+iex> Traffic.light(:red)
+"stop"
+iex> Traffic.light(:green)
+"go"
+----
+
+Each `light/1` clause matches a specific atom. There is no `if`, no
+`case`, just three small functions with the same name that differ in
+what they accept.
+
+=== Order Matters
+indexterm:[Pattern Matching, Multi-Clause Functions, Order]
+
+Elixir picks the first matching clause, so a broad pattern placed
+above a narrow pattern will swallow the narrow one:
+
+[source,elixir]
+----
+iex> defmodule Reply do
+...>   def message(_),        do: "unknown" <1>
+...>   def message({:ok, _}), do: "success"
+...> end
+
+iex> Reply.message({:ok, 42})
+"unknown"
+----
+<1> The catch-all clause matches everything, so the `{:ok, _}` clause
+is never reached. Fix it by putting the specific clause first.
+
+IMPORTANT: Put specific patterns on top, catch-all patterns at the
+bottom.
+
+=== Combining With Guards
+indexterm:[Pattern Matching, Multi-Clause Functions, Guards]
+
+Clauses can have xref:pattern-matching/guards.adoc[guards]. This is
+one of the most common shapes you will see in real Elixir code:
+
+[source,elixir]
+----
+iex> defmodule Law do
+...>   def can_vote?(age) when is_integer(age) and age >= 18, do: true
+...>   def can_vote?(age) when is_integer(age),               do: false
+...>   def can_vote?(_),                                      do: raise ArgumentError, "age must be an integer"
+...> end
+
+iex> Law.can_vote?(18)
+true
+iex> Law.can_vote?(16)
+false
+iex> Law.can_vote?("18")
+** (ArgumentError) age must be an integer
+----
+
+=== Default Arguments
+indexterm:[Pattern Matching, Multi-Clause Functions, Default Arguments]
+
+You can give a parameter a default value with `\\`. When a function
+with a default value has several clauses, Elixir requires you to
+declare the default in a *bodyless function head* above the clauses:
+
+[source,elixir]
+----
+iex> defmodule Greeter do
+...>   def hello(name, greeting \\ "Hello") <1>
+...>
+...>   def hello(name, greeting) when is_binary(name) do
+...>     "#{greeting}, #{name}!"
+...>   end
+...>
+...>   def hello(_name, _greeting) do
+...>     "I don't know who that is."
+...>   end
+...> end
+
+iex> Greeter.hello("Alice")
+"Hello, Alice!"
+iex> Greeter.hello("Bob", "Hi")
+"Hi, Bob!"
+iex> Greeter.hello(42)
+"I don't know who that is."
+----
+<1> The bodyless head declares the default. The real work happens in
+the clauses below.
+
+=== Arity Is Part of the Identity
+indexterm:[Pattern Matching, Multi-Clause Functions, Arity]
+
+Two functions with the same name but different arity are *two
+different functions*. Elixir writes them as `name/arity`:
+
+[source,elixir]
+----
+iex> defmodule Greeting do
+...>   def greet(),            do: "Hello, world!"
+...>   def greet(name),        do: "Hello, #{name}!"
+...>   def greet(name, time),  do: "Good #{time}, #{name}!"
+...> end
+
+iex> Greeting.greet()
+"Hello, world!"
+iex> Greeting.greet("Alice")
+"Hello, Alice!"
+iex> Greeting.greet("Bob", "morning")
+"Good morning, Bob!"
+----
+
+This has nothing to do with pattern matching, but you will see it
+alongside multi-clause functions all the time, so it is worth keeping
+the two ideas apart in your head.
+
+=== Unused Parameters
+indexterm:[Pattern Matching, Multi-Clause Functions, Unused Parameters]
+
+If a clause does not use one of its parameters, prefix the name with
+`_` so the compiler does not warn about it:
+
+[source,elixir]
+----
+def log({:ok, _value}),     do: :ok
+def log({:error, _reason}), do: :error
+----
+
+Both `_value` and `_reason` act as wildcards but document what would
+have been there. This is pure style: the compiler does not care, the
+next reader will.

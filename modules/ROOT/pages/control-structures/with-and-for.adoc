@@ -4,68 +4,74 @@ indexterm:[Control Structures,With,For]
 
 ==== `with` Keyword
 
-The `with` keyword in Elixir is used for a sequence of pattern matches, 
-returning the value of the last expression if all previous matches succeed.
+`with` chains a sequence of pattern matches. It succeeds when every
+step matches and gives you back the value of the last expression. If
+any step fails, `with` falls through to the `else` block (or returns
+the value that did not match).
 
-Here's an example:
+Here is the smallest possible example:
 
 [source,elixir]
 ----
-iex> fruits = [{:apple, 5}, {:orange, 3}, {:banana, 4}]
-iex> with {:apple, count} <- List.keyfind(fruits, :apple, 0) do
-...>   IO.puts("Found #{count} apples!")
-...> else
-...>   _ -> IO.puts("No apples found.")
+iex> with {:ok, n} <- {:ok, 42} do
+...>   "got #{n}"
 ...> end
-Found 5 apples!
+"got 42"
 ----
 
-In this example, we have a list of tuples representing different kinds of fruits 
-and their respective counts. We use the `with` keyword to pattern match on an 
-`{:apple, count}` tuple. 
+The `<-` operator reads as "pattern match against". It is very close
+to `=`, but when the match fails, `with` stops instead of raising.
 
-If the pattern match is successful, we print a message saying we found a 
-certain number of apples. If the pattern match fails, we fall back to the `else` 
-clause and print a message saying no apples were found. 
+A more realistic example chains two lookups that both have to
+succeed:
+
+[source,elixir]
+----
+iex> user = %{name: "Alice", city: "Berlin"}
+iex> with {:ok, name} <- Map.fetch(user, :name),
+...>      {:ok, city} <- Map.fetch(user, :city) do
+...>   "#{name} lives in #{city}"
+...> else
+...>   :error -> "missing data"
+...> end
+"Alice lives in Berlin"
+----
+
+If either `Map.fetch/2` returns `:error`, the `else` branch runs.
+
+NOTE: The `<-` arrow uses
+xref:pattern-matching/index-pattern-matching.adoc[pattern matching],
+so every shape you can write on the left side of `=` also works here.
 
 ==== `for` Comprehensions
 
-`for` comprehensions in Elixir provide a way to iterate over
-xref:enumerables.adoc[enumerables] (lists, maps, ranges, and similar
-data structures, covered in a later chapter) and generate a new list,
-optionally filtering the elements. The result of this operation can be
-assigned to a variable.
+`for` comprehensions iterate over one or more enumerables (lists,
+maps, ranges) and build a new collection from the results.
 
-Here's an example:
+Here is the smallest example:
 
 [source,elixir]
 ----
-iex> squared_numbers = for num <- [1, 2, 3, 4, 5], 
-...>     do: num * num
-[1, 4, 9, 16, 25]
-iex> squared_numbers
+iex> for num <- [1, 2, 3, 4, 5], do: num * num
 [1, 4, 9, 16, 25]
 ----
 
-In this example, `for` iterates over each number in the list `[1, 2, 3, 4, 5]`, 
-squares each number (`num * num`), and collects the results into a new list. 
-This list is then assigned to the variable `squared_numbers`.
+`for` walks each number in the list, squares it, and collects the
+results into a new list.
 
-You can also filter elements in a `for` comprehension by adding a filter
-expression after the generator. Elements for which the expression returns
-`false` are skipped:
+You can add a filter expression after the generator. Elements for
+which the filter returns `false` are skipped:
 
 [source,elixir]
 ----
-iex> odd_squares = for num <- [1, 2, 3, 4, 5], 
-...>     rem(num, 2) == 1,
-...>     do: num * num
-[1, 9, 25]
-iex> odd_squares
+iex> for num <- [1, 2, 3, 4, 5], rem(num, 2) == 1, do: num * num
 [1, 9, 25]
 ----
 
-In this example, only odd numbers are squared. The `rem(num, 2) == 1` condition 
-filters out even numbers, so they are not included in the result. This resulting 
-list is assigned to the variable `odd_squares`.
+Only odd numbers survive the filter, so the result contains their
+squares.
 
+TIP: For most transformations a function from the
+xref:enumerables.adoc[`Enum` module] reads more naturally than a
+`for` comprehension. Reach for `for` when you want to combine several
+generators or filters in one place.
