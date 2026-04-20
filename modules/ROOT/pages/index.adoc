@@ -2,33 +2,37 @@
 = Preface
 Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
-This book teaches the **basics of Elixir**: the language
-fundamentals you need before you pick up Phoenix, Ash, Nerves, or
-any other BEAM framework. Pattern matching, the pipe operator,
-processes, modules and functions, higher-order functions, data
-types, control structures, recursion, Mix — the bedrock. It's
-written the way I'd teach these in a workshop, bite-sized
-examples and one concept at a time, so you can work through it
-on your own at the same pace.
+This is a beginner's book for the **basics of Elixir**: the
+language fundamentals you need before you pick up Phoenix, Ash,
+Nerves, or any other BEAM framework. Pattern matching, the pipe
+operator, processes, modules and functions, higher-order
+functions, data types, control structures, recursion, Mix —
+the bedrock.
+
+I'll not sugar-coat this: Elixir is a functional language,
+which means it thinks differently than the C / Java / Python /
+Ruby-shaped one you probably already know. The paradigm takes
+a while to settle. Grab a coffee first if this is your first
+functional language — it took me a long time too. The upside:
+once it clicks, it clicks hard.
+
+The book is written the way I'd teach these basics in a
+workshop — bite-sized examples, one concept at a time — so
+you can work through it on your own at the same pace.
 
 The material started life as the Elixir chapter of the
-link:https://wintermeyer-consulting.de/phoenix/book/[_Elixir, Phoenix and
-Ash Beginner's Guide_]. It grew large enough to stand on its own
-and became a separate book. The Phoenix guide still points here
-for the language part; this book stays focused on the
-fundamentals and doesn't touch web frameworks.
+link:https://wintermeyer-consulting.de/phoenix/book/[_Elixir,
+Phoenix and Ash Beginner's Guide_]. It grew large enough to
+stand on its own and became a separate book. When you've got
+the language under your hands, the Phoenix guide is where the
+web framework picks up.
 
-The sidebar lets you jump to any topic at any time — nothing is
-locked, and later chapters never assume you read the preceding
-ones to the letter. That said, the book is written to be read
-front to back: each topic sets up the next, examples build on
-earlier ones, and the shortest path from zero to confident
-Elixir is still "start at the top and keep going".
-
-If this is your first functional programming language you might
-want to get a cup of coffee first. It might take a while to get
-used to the functional programming paradigm. **It took me a long
-time too!**
+The sidebar lets you jump to any topic at any time — nothing
+is locked, and later chapters never assume you read the
+preceding ones to the letter. That said, the book is written
+to be read front to back: each topic sets up the next, examples
+build on earlier ones, and the shortest path from zero to
+confident Elixir is still "start at the top and keep going".
 
 == Further reading
 
@@ -53,4 +57,3 @@ Write me at mailto:sw@wintermeyer-consulting.de[sw@wintermeyer-consulting.de].
 Feedback, bug reports, kind words, angry words — all welcome.
 
 — Stefan
-
