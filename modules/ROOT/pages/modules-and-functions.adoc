@@ -352,3 +352,39 @@ ExUnit.Case` in your test files. This is a practical example where `ExUnit.Case`
 provides a set of functionalities (like assert functions) that will be
 accessible within your test cases.
 
+[.agentic-tip]
+****
+.Agentic Coding Tip: The `/simplify` Slash Command
+Once you've written a real module, you've also written the
+territory where idiomatic refactoring lives. Claude Code
+ships a built-in `/simplify` slash command that rewrites
+the current file into more idiomatic Elixir while
+preserving behaviour.
+
+Where it's good in Elixir:
+
+* Collapsing nested `case` / `if` chains into `with` or
+  multi-clause functions.
+* Turning explicit accumulators into a pipe (`|>`) through
+  `Enum.map` / `Enum.reduce` / `Enum.filter`.
+* Replacing `Map.get(m, :key, default)` chains with
+  pattern matching on the key.
+* Removing unnecessary intermediate variables when a pipe
+  reads clearer.
+
+Where it's not:
+
+* Anything that affects the module's public contract
+  (function names, arities, guards) — other code in the
+  project may depend on the exact shape.
+* Performance-sensitive code where `Enum` would allocate
+  an intermediate list and `Stream` or a recursive
+  function is faster.
+* Code where an explicit, verbose form is the teaching
+  point.
+
+Treat `/simplify` as a "one file, one diff" tool. Always
+read the diff before accepting; shorter code is not
+automatically better code.
+****
+

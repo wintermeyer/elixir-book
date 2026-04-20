@@ -54,6 +54,60 @@ xref:pattern-matching/guards.adoc[guards] and
 xref:pattern-matching/multi-clause-functions.adoc[multi-clause functions]
 chapters for those applications.
 
+[.agentic-tip]
+****
+.Agentic Coding Tip: `=` is Pattern Matching, Not Assignment
+Every other mainstream language reads `=` as "store the
+right-hand side in the left-hand side variable." Elixir
+reads it as "try to match the shape on the left against
+the value on the right, and bind any variables along the
+way." An agent that internalised the first reading will
+write code that looks right and raises `MatchError` at
+runtime.
+
+The common shape of the trap:
+
+[source,elixir]
+----
+# Agent writes:
+{:ok, user} = Accounts.find_user(id)
+
+# ...then Accounts.find_user/1 returns {:error, :not_found}
+# for an unknown id, and the whole process crashes with
+# ** (MatchError) no match of right hand side value:
+#    {:error, :not_found}
+----
+
+This is *sometimes* exactly what you want — let it crash
+on the unexpected case, supervisors handle it. But the
+agent rarely reasons about that trade-off; it just picks
+the shortest shape. The safer default in most situations
+is `case` (or `with`), which lets you handle both branches
+explicitly:
+
+[source,elixir]
+----
+case Accounts.find_user(id) do
+  {:ok, user}      -> render_profile(user)
+  {:error, reason} -> render_not_found(reason)
+end
+----
+
+*Rule to add to your project's `CLAUDE.md`:*
+
+[source]
+----
+When calling a function that returns a tagged tuple
+(`{:ok, _}` / `{:error, _}`) or any other value with
+more than one possible shape, do NOT use `=` to match it
+unless crashing on the unexpected shape is genuinely
+what's wanted. Default to `case`, `with`, or a function
+head with multiple clauses. If you do use `=`, add a
+one-line comment explaining why letting the process
+crash on a non-match is correct here.
+----
+****
+
 === Destructuring Lists
 indexterm:[Pattern Matching, Lists]
 

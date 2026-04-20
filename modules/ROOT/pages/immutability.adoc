@@ -67,4 +67,57 @@ value it captured.
 NOTE: You do not need to fully understand immutability to start learning
 Elixir. Just keep the idea in the back of your mind. It will click over
 time.
-  
+
+[.agentic-tip]
+****
+.Agentic Coding Tip: Elixir Functions Return New Values — They Don't Mutate
+An agent trained primarily on JavaScript, Python, or Ruby
+will instinctively reach for in-place mutation. When you
+ask for "add an item to the shopping list", Claude often
+writes something like:
+
+[source,elixir]
+----
+# WRONG — this doesn't exist
+shopping_list.push("pineapple")
+----
+
+or worse, assumes that assigning to a "field" of a map
+changes the original:
+
+[source,elixir]
+----
+# This does NOT change `user`. It creates a new map.
+Map.put(user, :verified, true)
+----
+
+Elixir doesn't have that kind of mutation. `Map.put/3`
+returns a new map. The original `user` is untouched. You
+use the return value or assign the name to the new value:
+
+[source,elixir]
+----
+iex> user = %{name: "Ada", verified: false}
+iex> user = Map.put(user, :verified, true)
+%{name: "Ada", verified: true}
+----
+
+The same applies to lists (`[head | tail]` builds a new
+list), to structs (`%User{user | verified: true}`) and to
+any compound value. If you do not use the return value,
+the "change" is discarded.
+
+*Rule to add to your project's `CLAUDE.md`:*
+
+[source]
+----
+Elixir values are immutable. Functions like Map.put/3,
+List.insert_at/3, Enum.map/2 return a new value — they
+never mutate the input. Always bind the return value (or
+pipe it into the next step). If you find yourself writing
+code that "modifies" a struct, map or list in place, stop
+— that's not how Elixir works. Suggest rewriting with
+`Map.put/3`, `List.replace_at/3`, update syntax
+(`%{m | key: value}`) or a pipe.
+----
+****

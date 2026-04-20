@@ -96,3 +96,54 @@ This output tells us that `"Elixir"` is a 6-byte BitString and gives
 further details like the string's raw representation and the protocols
 it implements.
 
+[.agentic-tip]
+****
+.Agentic Coding Tip: Use `IO.inspect/2` for Debug Traces, Not `IO.puts`
+When an AI agent adds a debug trace to a function, it
+reaches for `IO.puts` because that's what Hello World
+tutorials use. That is fine for a string literal and
+nothing else. The moment the value is a map, tuple, list,
+atom or `nil`, `IO.puts` throws away half the information:
+
+[source,elixir]
+----
+iex> user = %{id: 42, name: "Ada"}
+iex> IO.puts(user)
+** (Protocol.UndefinedError) protocol String.Chars not implemented for %{id: 42, name: "Ada"}
+
+iex> IO.inspect(user)
+%{id: 42, name: "Ada"}
+%{id: 42, name: "Ada"}
+----
+
+`IO.inspect/2` prints the Elixir representation (what you
+would type to recreate the value) and returns the value
+itself, which means you can drop it into a pipe without
+breaking the chain:
+
+[source,elixir]
+----
+[1, 2, 3]
+|> Enum.map(&(&1 * 2))
+|> IO.inspect(label: "after map")
+|> Enum.sum()
+----
+
+The `label:` option is the small detail that pays off
+when you have more than one `IO.inspect` in the same
+function. For richer output that includes the expression
+and location, reach for `dbg/2` shown at the top of this
+chapter.
+
+*Rule to add to your project's `CLAUDE.md`:*
+
+[source]
+----
+For temporary debug output in Elixir code, use
+`IO.inspect(value, label: "something")` or `dbg(value)`,
+not `IO.puts`. `IO.puts` is for human-readable strings
+and will crash on maps, tuples, structs, or `nil`. Remove
+all debug `IO.inspect` / `dbg` calls before committing.
+----
+****
+

@@ -30,3 +30,62 @@ should be used sparingly. **Do not dynamically create atoms from user input or
 untrusted data**, as this can exhaust your system's available memory and cause it
 to crash. It is unlikely that you run into this problem but not impossilbe.footnote:[More information about atoms not being garbage collected: https://stackoverflow.com/questions/20517966/how-erlang-atoms-can-be-garbage-collected/54919072#54919072]
 
+[.agentic-tip]
+****
+.Agentic Coding Tip: Never Let the Agent Call `String.to_atom/1` on User Input
+The WARNING above is the single most important rule an AI
+agent needs to be reminded of when writing Elixir. When
+asked to "look up the user's role from a request
+parameter," Claude will often reach for the shortest path:
+
+[source,elixir]
+----
+# DoS waiting to happen
+role = String.to_atom(params["role"])
+----
+
+Every new unique value of `params["role"]` creates a new
+atom, and atoms are never garbage collected. An attacker
+who can reach the endpoint can send unique strings until
+the BEAM runs out of atom slots (the default limit is
+around one million) and the entire node crashes. Phoenix
+has this trap built into many request parameters.
+
+The safe call is `String.to_existing_atom/1`, which only
+succeeds for atoms that already exist in the system:
+
+[source,elixir]
+----
+role = String.to_existing_atom(params["role"])
+# ArgumentError if the string isn't already an atom
+----
+
+Even better, pattern-match the expected set explicitly:
+
+[source,elixir]
+----
+case params["role"] do
+  "admin"  -> :admin
+  "editor" -> :editor
+  "viewer" -> :viewer
+  _        -> :viewer
+end
+----
+
+*Rule to add to your project's `CLAUDE.md`:*
+
+[source]
+----
+Never call `String.to_atom/1` on data that comes from
+outside the application (HTTP params, request bodies,
+database rows, message queues, environment variables,
+external APIs). That is a denial-of-service primitive.
+Use `String.to_existing_atom/1` when the set of valid
+atoms is already defined at compile time, or convert
+explicitly via a `case` expression enumerating the
+allowed strings. The same applies to
+`List.to_atom/1` and `:erlang.binary_to_atom/2` with
+`:utf8` encoding.
+----
+****
+

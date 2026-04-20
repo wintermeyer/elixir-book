@@ -43,6 +43,18 @@ book. It grew large enough to stand on its own and became a
 separate book. When you've got the language under your hands,
 the Phoenix guide is where the web framework picks up.
 
+Most readers will write Elixir alongside an AI coding agent,
+and this book assumes you are one of them. Everything still
+works if you type every character yourself. Throughout the
+book you will find boxes labelled *Agentic Coding Tip*
+flagging the Elixir-specific places where an agent reliably
+takes a wrong turn (reaching for mutation, forgetting that
+`=` is pattern matching, wrapping everything in `try` /
+`rescue`, turning user input into atoms), together with a
+concrete `CLAUDE.md` rule or prompt that keeps the agent
+honest. The tips assume Claude Code as the concrete tool,
+but the underlying advice applies to any capable agent.
+
 The sidebar lets you jump to any topic at any time — nothing
 is locked, and later chapters never assume you read the
 preceding ones to the letter. That said, the book is written

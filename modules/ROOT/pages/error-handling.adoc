@@ -175,3 +175,48 @@ a way to model application errors.
 * Use `try` / `rescue` only when you cannot avoid a raising call.
 * If you see `!` at the end of a function name (`File.read!/1`), that
   function raises on error. Its non-`!` twin returns a tagged tuple.
+
+[.agentic-tip]
+****
+.Agentic Coding Tip: "Let It Crash" vs the Agent's `try` / `rescue` Reflex
+An AI agent trained on Java, Python, or Ruby has a strong
+reflex: wrap anything that might fail in `try` / `catch`
+/ `rescue`, log the error, return a default, move on.
+That is the opposite of idiomatic Elixir.
+
+Elixir's error-handling philosophy rests on two ideas:
+
+* _Expected_ failures (missing user, invalid input,
+  network timeout) are values — return
+  `{:error, reason}` from the function and let the caller
+  decide with a `case`.
+* _Unexpected_ failures (a genuine bug) should crash the
+  process. A supervisor restarts it in a clean state, and
+  the bad input doesn't corrupt state in the rest of the
+  system. This is what "let it crash" means.
+
+When Claude wraps every database call in `try` / `rescue`
+and returns `nil` on error, three things go wrong at
+once: the supervisor has nothing to act on (the process
+stayed alive), the `nil` propagates to places that expect
+a real value, and the operator never finds out there was
+a bug.
+
+*Rule to add to your project's `CLAUDE.md`:*
+
+[source]
+----
+Don't wrap code in `try` / `rescue` by default. Elixir's
+"let it crash" philosophy expects unexpected errors to
+kill the process so a supervisor can restart it clean.
+Use `try` / `rescue` only when:
+  (a) you're calling into code that raises as its contract
+      (File.read!/1, Ecto.Repo.one!/1) and a missing result
+      is an expected application-level case;
+  (b) you're at a shutdown/cleanup boundary that must run
+      regardless of the inner outcome.
+For expected failures, return `{:ok, _}` / `{:error, _}`
+tuples and let the caller pattern-match. Never silently
+rescue and return `nil` — that hides real bugs.
+----
+****
