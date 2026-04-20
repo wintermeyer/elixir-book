@@ -3,8 +3,8 @@
 Source for the standalone Elixir book at
 <https://wintermeyer-consulting.de/elixir/book/>.
 
-Content was lifted from the Elixir chapter of
-[_An Elixir, Phoenix and Ash Beginner's Guide_](https://github.com/wintermeyer/phoenix-book).
+Content was lifted from the Elixir chapter of the
+[_Phoenix_ book](https://github.com/wintermeyer/phoenix-book).
 The Phoenix book used to render the same pages under
 `/phoenix/book/elixir/*`; those URLs now 301-redirect here.
 

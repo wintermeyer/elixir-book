@@ -21,11 +21,10 @@ workshop — bite-sized examples, one concept at a time — so
 you can work through it on your own at the same pace.
 
 The material started life as the Elixir chapter of the
-link:https://wintermeyer-consulting.de/phoenix/book/[_Elixir,
-Phoenix and Ash Beginner's Guide_]. It grew large enough to
-stand on its own and became a separate book. When you've got
-the language under your hands, the Phoenix guide is where the
-web framework picks up.
+link:https://wintermeyer-consulting.de/phoenix/book/[_Phoenix_]
+book. It grew large enough to stand on its own and became a
+separate book. When you've got the language under your hands,
+the Phoenix guide is where the web framework picks up.
 
 The sidebar lets you jump to any topic at any time — nothing
 is locked, and later chapters never assume you read the
