@@ -9,10 +9,10 @@ types, control structures, recursion, Mix — the bedrock.
 
 The material started life as the Elixir chapter of the
 link:https://wintermeyer-consulting.de/phoenix/book/[_Elixir, Phoenix and
-Ash Beginner's Guide_]. It grew large enough to stand on its own,
-so in April 2026 it became a separate book. The Phoenix guide
-still points here for the language part; this book stays focused
-on the fundamentals and doesn't touch web frameworks.
+Ash Beginner's Guide_]. It grew large enough to stand on its own
+and became a separate book. The Phoenix guide still points here
+for the language part; this book stays focused on the
+fundamentals and doesn't touch web frameworks.
 
 Pick a topic from the sidebar.
 
