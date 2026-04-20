@@ -1,14 +1,22 @@
 = Welcome
 Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
-This is the Elixir chapter from the
+This book teaches the **basics of Elixir**: the language
+fundamentals you need before you pick up Phoenix, Ash, Nerves, or
+any other BEAM framework. Pattern matching, the pipe operator,
+processes, modules and functions, higher-order functions, data
+types, control structures, recursion, Mix — the bedrock.
+
+The material started life as the Elixir chapter of the
 link:https://wintermeyer-consulting.de/phoenix/book/[_Elixir, Phoenix and
-Ash Beginner's Guide_], split page-per-topic so each concept has its
-own URL. If you want the full guide (Elixir, Phoenix, Ash, and
-recipes), read it in the parent book.
+Ash Beginner's Guide_]. It grew large enough to stand on its own,
+so in April 2026 it became a separate book. The Phoenix guide
+still points here for the language part; this book stays focused
+on the fundamentals and doesn't touch web frameworks.
 
 Pick a topic from the sidebar.
 
-If this is your first functional programming language you might want
-to get a cup of coffee first. It might take a while to get used to
-the functional programming paradigm. **It took me a long time too!**
+If this is your first functional programming language you might
+want to get a cup of coffee first. It might take a while to get
+used to the functional programming paradigm. **It took me a long
+time too!**
