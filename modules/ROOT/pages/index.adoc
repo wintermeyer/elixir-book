@@ -20,6 +20,10 @@ The book is written the way I'd teach these basics in a
 workshop — bite-sized examples, one concept at a time — so
 you can work through it on your own at the same pace.
 
+Shameless plug: if you'd rather have the training itself —
+personalized, on-site or remote — drop me an email at
+mailto:sw@wintermeyer-consulting.de[sw@wintermeyer-consulting.de].
+
 The material started life as the Elixir chapter of the
 link:https://wintermeyer-consulting.de/phoenix/book/[_Phoenix_]
 book. It grew large enough to stand on its own and became a
