@@ -9,12 +9,24 @@ operator, processes, modules and functions, higher-order
 functions, data types, control structures, recursion, Mix —
 the bedrock.
 
-I'll not sugar-coat this: Elixir is a functional language,
-which means it thinks differently than the C / Java / Python /
-Ruby-shaped one you probably already know. The paradigm takes
-a while to settle. Grab a coffee first if this is your first
-functional language — it took me a long time too. The upside:
-once it clicks, it clicks hard.
+Good news first: if Elixir is your first programming language,
+you're in for an easier ride than you'd guess. The syntax is
+small, the feedback loop (iex) is fast, and the compiler is
+friendly.
+
+The honest part: if you're coming from an object-oriented
+world — Java, C#, Python, Ruby — the jump to functional
+thinking is a real, steep hill. Everything you know about
+objects, inheritance, mutable state and "just add a field to
+that class" has to be unlearned. Pattern matching,
+immutability, processes, recursion: the furniture is
+unfamiliar. Plan for a week or two of feeling slow before
+things start to flow. It took me a long time too.
+
+Worth every step of the hill. Once the functional paradigm
+clicks, it clicks hard — and the reward is OTP, LiveView, and
+the BEAM's concurrency model, all things you won't find
+assembled this well anywhere else.
 
 The book is written the way I'd teach these basics in a
 workshop — bite-sized examples, one concept at a time — so
