@@ -1,6 +1,7 @@
 [[preface]]
 = Preface
 Stefan Wintermeyer <sw@wintermeyer-consulting.de>
+:page-notoc: true
 
 This is a beginner's book for the **basics of Elixir**: the
 language fundamentals you need before you pick up Phoenix, Ash,
